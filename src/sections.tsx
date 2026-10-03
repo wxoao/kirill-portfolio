@@ -7,27 +7,8 @@ import { useLanguage } from './i18n';
 
 export function MarqueeSection() {
   const { t } = useLanguage();
-  const section = useRef<HTMLElement>(null);
-  const row1 = useRef<HTMLDivElement>(null);
-  const row2 = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  useEffect(() => {
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      if (!section.current || !row1.current || !row2.current) return;
-      const sectionTop = section.current.getBoundingClientRect().top + window.scrollY;
-      const offset = reduced ? 0 : (window.scrollY - sectionTop + window.innerHeight) * 0.3;
-      row1.current.style.transform = `translateX(${offset - 200}px)`;
-      row2.current.style.transform = `translateX(${-(offset - 200)}px)`;
-    };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
-  }, [reduced]);
-  return <section ref={section} aria-label={t.marqueeLabel} className="overflow-hidden bg-[#0C0C0C] pb-10 pt-24 sm:pt-32 md:pt-40"><div className="flex flex-col gap-3">{[marqueeImages.slice(0, 11), marqueeImages.slice(11)].map((images, row) => <div key={row} ref={row === 0 ? row1 : row2} className="relative flex w-max gap-3" style={{ left: -(images.length * 432), willChange: 'transform' }}>{[...images, ...images, ...images].map((src, index) => <img key={`${row}-${index}`} src={src} alt={index < images.length ? `${t.showcase} ${row === 0 ? index + 1 : index + 12}` : ''} aria-hidden={index >= images.length ? true : undefined} onError={event => { if (event.currentTarget.src !== marqueeImages[0]) event.currentTarget.src = marqueeImages[0]; }} loading="lazy" width={420} height={270} className="h-[270px] w-[420px] shrink-0 rounded-2xl bg-[#161616] object-cover" />)}</div>)}</div></section>;
+  const split = Math.ceil(marqueeImages.length / 2);
+  return <section aria-label={t.marqueeLabel} className="overflow-hidden bg-[#0C0C0C] pb-10 pt-24 sm:pt-32 md:pt-40"><div className="flex flex-col gap-3">{[marqueeImages.slice(0, split), marqueeImages.slice(split)].map((images, row) => <div key={row} className={`marquee-track relative flex w-max gap-3 ${row === 1 ? 'marquee-track-reverse' : ''}`} style={{ animationDuration: `${images.length * 4}s` }}>{[...images, ...images, ...images].map((src, index) => <img key={`${row}-${index}`} src={src} alt={index < images.length ? `${t.showcase} ${row * split + index + 1}` : ''} aria-hidden={index >= images.length ? true : undefined} loading="lazy" width={420} height={236.25} className="aspect-video w-[420px] shrink-0 rounded-2xl bg-[#161616] object-cover" />)}</div>)}</div></section>;
 }
 
 const decorativeBase = 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/';
@@ -55,18 +36,42 @@ function ProjectCard({ project, index, totalCards, progress, onOpen }: { project
   const targetScale = 1 - (totalCards - 1 - index) * 0.03;
   const scale = useTransform(progress, [index / totalCards, 1], [1, targetScale]);
   const reduced = useReducedMotion();
-  return <div className="project-stage sticky top-24 h-[85vh] md:top-32"><motion.article className="project-card relative rounded-[40px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[50px] sm:p-6 md:rounded-[60px] md:p-8" style={{ top: index * 28, scale: reduced ? 1 : scale }} aria-labelledby={`project-${index}`}>
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-4 sm:mb-8"><div className="flex items-center gap-5 md:gap-8"><span aria-hidden="true" className="font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}>{String(index + 1).padStart(2, '0')}</span><div><p className="mb-1 text-xs font-light uppercase tracking-widest text-[#D7E2EA]/60 sm:text-sm">{project.category}</p><h3 id={`project-${index}`} className="font-medium uppercase leading-tight" style={{ fontSize: 'clamp(1.05rem, 2.2vw, 2.1rem)' }}>{name}</h3></div></div><LiveProjectButton onClick={() => onOpen(project)} /></div>
+  return <div className="project-stage sticky top-24 h-[85vh] md:top-32"><motion.article className="project-card relative rounded-[40px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[50px] sm:p-6 md:rounded-[60px] md:p-8" style={{ top: index * 12, scale: reduced ? 1 : scale }} aria-labelledby={`project-${index}`}>
+    <div className="mb-6 flex items-start justify-between gap-4 sm:mb-8"><div className="flex min-w-0 flex-1 items-center gap-5 md:gap-8"><span aria-hidden="true" className="shrink-0 font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}>{String(index + 1).padStart(2, '0')}</span><div className="min-w-0"><p className="mb-1 text-xs font-light uppercase tracking-widest text-[#D7E2EA]/60 sm:text-sm">{project.category}</p><h3 id={`project-${index}`} className="font-medium uppercase leading-tight" style={{ fontSize: 'clamp(1.05rem, 2.2vw, 2.1rem)' }}>{name}</h3></div></div><LiveProjectButton onClick={() => onOpen(project)} /></div>
     <p className="mb-6 max-w-2xl font-light leading-relaxed opacity-60 sm:mb-8" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.25rem)' }}>{localize(project.summary)}</p>
-    <div className="grid grid-cols-[2fr_3fr] gap-3 sm:gap-4"><div className="flex min-w-0 flex-col gap-3 sm:gap-4"><img src={project.images[0]} alt={`${name} — ${t.firstDetail}`} loading="lazy" className="project-image project-image-top w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]" style={{ height: 'clamp(130px, 16vw, 230px)' }} /><img src={project.images[1]} alt={`${name} — ${t.secondDetail}`} loading="lazy" className="project-image project-image-bottom w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]" style={{ height: 'clamp(160px, 22vw, 340px)' }} /></div><img src={project.images[2]} alt={`${name} — ${t.mainVisual}`} loading="lazy" className="project-image h-full min-h-0 w-full rounded-[40px] object-cover sm:rounded-[50px] md:rounded-[60px]" /></div>
+    <div className="project-card-gallery">
+      {[1, 2, 0].map((imageIndex) => <div key={imageIndex} className={`project-card-visual ${imageIndex === 0 ? 'project-card-cover' : ''}`}><img src={project.previewImages[imageIndex]} alt={`${name} — ${imageIndex === 0 ? t.mainVisual : imageIndex === 1 ? t.firstDetail : t.secondDetail}`} loading="lazy" /></div>)}
+    </div>
   </motion.article></div>;
 }
 
 function ProjectDialog({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const { t, localize } = useLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => { if (project) dialog.current?.showModal(); else dialog.current?.close(); }, [project]);
-  return <dialog ref={dialog} className="dialog project-dialog" aria-labelledby="project-dialog-title" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>{project && <><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-xs uppercase tracking-widest opacity-60">{project.category}</p><h2 id="project-dialog-title" className="text-2xl font-medium uppercase sm:text-3xl">{localize(project.name)}</h2></div><button aria-label={t.closeProject} onClick={onClose} className="rounded-full p-2 hover:bg-white/10"><X /></button></div><p className="mb-8 text-lg font-light">{localize(project.description)}</p><p className="mb-8 text-lg font-light"><span className="font-medium">{t.techStack}: </span>{project.stack}</p><div className="grid gap-4">{project.images.map((src, index) => <img key={src} src={src} alt={`${localize(project.name)} — ${t.visual} ${index + 1}`} className="w-full rounded-2xl" />)}</div><p className="mt-5 text-sm font-light opacity-60">{t.projectPreview}</p></>}</dialog>;
+  const [displayedProject, setDisplayedProject] = useState<Project | null>(null);
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (project) {
+      setDisplayedProject(project);
+      element.classList.remove('is-closing');
+      if (!element.open) element.showModal();
+      element.scrollTop = 0;
+      return;
+    }
+    if (!element.open) return;
+    if (reduced) { element.close(); setDisplayedProject(null); return; }
+    element.classList.add('is-closing');
+    const timer = window.setTimeout(() => {
+      element.close();
+      element.classList.remove('is-closing');
+      setDisplayedProject(null);
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [project, reduced]);
+  const visibleProject = project ?? displayedProject;
+  return <dialog ref={dialog} className="dialog project-dialog" aria-labelledby="project-dialog-title" onCancel={event => { event.preventDefault(); onClose(); }} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>{visibleProject && <><div className="mb-6 flex items-center justify-between gap-4"><div><p className="text-xs uppercase tracking-widest opacity-60">{visibleProject.category}</p><h2 id="project-dialog-title" className="text-2xl font-medium uppercase sm:text-3xl">{localize(visibleProject.name)}</h2></div><button aria-label={t.closeProject} onClick={onClose} className="shrink-0 rounded-full p-2 hover:bg-white/10"><X /></button></div><p className="mb-8 text-lg font-light">{localize(visibleProject.description)}</p><p className="mb-8 text-lg font-light"><span className="font-medium">{t.techStack}: </span>{visibleProject.stack}</p><div className="project-gallery">{visibleProject.images.map((src, index) => <div key={src} className="project-gallery-item"><img src={src} loading="lazy" alt={`${localize(visibleProject.name)} — ${t.visual} ${index + 1}`} className="rounded-2xl" /></div>)}</div><p className="mt-5 text-sm font-light">{visibleProject.url ? <a href={visibleProject.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 transition-opacity hover:opacity-70">{t.projectLink}</a> : <span className="opacity-60">{t.projectPreview}</span>}</p></>}</dialog>;
 }
 
 export function ProjectsSection() {

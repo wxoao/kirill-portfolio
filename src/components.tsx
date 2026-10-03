@@ -10,7 +10,7 @@ export function FadeIn({ children, delay = 0, duration = 0.7, x = 0, y = 30, cla
   return <MotionDiv className={className} initial={reduced ? false : { opacity: 0, x, y }} whileInView={{ opacity: 1, x: 0, y: 0 }} viewport={{ once: true, margin: '50px', amount: 0 }} transition={{ delay, duration, ease: [0.25, 0.1, 0.25, 1] }}>{children}</MotionDiv>;
 }
 
-export function Magnet({ children, padding = 150, strength = 3, activeTransition = 'transform 0.3s ease-out', inactiveTransition = 'transform 0.6s ease-in-out' }: { children: ReactNode; padding?: number; strength?: number; activeTransition?: string; inactiveTransition?: string }) {
+export function Magnet({ children, padding = 150, strength = 3, followAnywhere = false, activeTransition = 'transform 0.3s ease-out', inactiveTransition = 'transform 0.6s ease-in-out' }: { children: ReactNode; padding?: number; strength?: number; followAnywhere?: boolean; activeTransition?: string; inactiveTransition?: string }) {
   const container = useRef<HTMLDivElement>(null);
   const moving = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
@@ -22,15 +22,17 @@ export function Magnet({ children, padding = 150, strength = 3, activeTransition
       const bounds = container.current.getBoundingClientRect();
       const dx = event.clientX - bounds.left - bounds.width / 2;
       const dy = event.clientY - bounds.top - bounds.height / 2;
-      const active = Math.abs(dx) < bounds.width / 2 + padding && Math.abs(dy) < bounds.height / 2 + padding;
+      const active = followAnywhere || Math.abs(dx) < bounds.width / 2 + padding && Math.abs(dy) < bounds.height / 2 + padding;
       if (!active) { reset(); return; }
       moving.current.style.transition = activeTransition;
-      moving.current.style.transform = `translate3d(${dx / strength}px,${dy / strength}px,0)`;
+      const x = followAnywhere ? Math.max(-80, Math.min(80, dx / strength)) : dx / strength;
+      const y = followAnywhere ? Math.max(-80, Math.min(80, dy / strength)) : dy / strength;
+      moving.current.style.transform = `translate3d(${x}px,${y}px,0)`;
     };
     window.addEventListener('mousemove', move, { passive: true });
     document.addEventListener('mouseleave', reset);
     return () => { window.removeEventListener('mousemove', move); document.removeEventListener('mouseleave', reset); };
-  }, [padding, strength, activeTransition, inactiveTransition, reduced]);
+  }, [padding, strength, followAnywhere, activeTransition, inactiveTransition, reduced]);
   return <div ref={container}><div ref={moving} style={{ willChange: 'transform' }}>{children}</div></div>;
 }
 
@@ -49,20 +51,37 @@ export function AnimatedText({ text }: { text: string }) {
 
 export function ContactButton({ onClick }: { onClick: () => void }) {
   const { t } = useLanguage();
-  return <button onClick={onClick} className="contact-button shrink-0 rounded-full px-8 py-3 text-xs font-medium uppercase tracking-widest text-white transition duration-200 hover:brightness-125 sm:px-10 sm:py-3.5 sm:text-sm md:px-12 md:py-4 md:text-base">{t.contactButton}</button>;
+  return <button onClick={onClick} className="contact-button action-hover shrink-0 rounded-full px-8 py-3 text-xs font-medium uppercase tracking-widest text-white transition duration-200 hover:brightness-125 sm:px-10 sm:py-3.5 sm:text-sm md:px-12 md:py-4 md:text-base">{t.contactButton}</button>;
 }
 
 export function LiveProjectButton({ onClick }: { onClick: () => void }) {
   const { t } = useLanguage();
-  return <button onClick={onClick} className="shrink-0 rounded-full border-2 border-[#D7E2EA] px-8 py-3 text-sm font-medium uppercase tracking-widest text-[#D7E2EA] transition-colors hover:bg-[#D7E2EA]/10 sm:px-10 sm:py-3.5 sm:text-base">{t.liveProjectButton}</button>;
+  return <button onClick={onClick} className="action-hover shrink-0 rounded-full border-2 border-[#D7E2EA] px-8 py-3 text-sm font-medium uppercase tracking-widest text-[#D7E2EA] transition-colors hover:bg-[#D7E2EA]/10 sm:px-10 sm:py-3.5 sm:text-base">{t.liveProjectButton}</button>;
 }
 
 export function ContactDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useLanguage();
   const dialog = useRef<HTMLDialogElement>(null);
   const [copied, setCopied] = useState(false);
+  const reduced = useReducedMotion();
   const email = 'thekarchicyt@gmail.com';
-  useEffect(() => { if (open) dialog.current?.showModal(); else dialog.current?.close(); }, [open]);
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (open) {
+      element.classList.remove('is-closing');
+      if (!element.open) element.showModal();
+      return;
+    }
+    if (!element.open) return;
+    if (reduced) { element.close(); return; }
+    element.classList.add('is-closing');
+    const timer = window.setTimeout(() => {
+      element.close();
+      element.classList.remove('is-closing');
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [open, reduced]);
   const copy = async () => { await navigator.clipboard.writeText(email!); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-  return <dialog ref={dialog} className="dialog" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) onClose(); }} aria-labelledby="contact-title"><div className="mb-8 flex items-center justify-between gap-8"><h2 id="contact-title" className="text-3xl font-semibold uppercase">{t.contactTitle}</h2><button aria-label={t.closeContact} onClick={onClose} className="rounded-full p-2 transition-colors hover:bg-white/10"><X /></button></div><p className="mb-8 text-lg font-light">{t.contactDescription}</p><a href={`mailto:${email}`} className="contact-button inline-flex items-center gap-3 rounded-full px-5 py-4 text-sm font-medium sm:px-8 sm:text-base"><Mail size={20} />{email}</a><a href="https://t.me/wxoao" target="_blank" rel="noreferrer" className="mt-4 flex w-fit items-center gap-3 rounded-full border border-[#D7E2EA]/50 px-8 py-4 transition-colors hover:bg-white/10"><Send size={20} />Telegram · @wxoao</a><button onClick={copy} className="mt-6 flex items-center gap-2 text-sm text-[#D7E2EA]/70">{copied ? <Check size={16} /> : <Copy size={16} />}{copied ? t.emailCopied : t.copyEmail}</button></dialog>;
+  return <dialog ref={dialog} className="dialog contact-dialog" onCancel={event => { event.preventDefault(); onClose(); }} onClick={event => { if (event.target === event.currentTarget) onClose(); }} aria-labelledby="contact-title"><div className="mb-8 flex items-center justify-between gap-8"><h2 id="contact-title" className="text-3xl font-semibold uppercase">{t.contactTitle}</h2><button aria-label={t.closeContact} onClick={onClose} className="rounded-full p-2 transition-colors hover:bg-white/10"><X /></button></div><p className="mb-8 text-lg font-light">{t.contactDescription}</p><a href={`mailto:${email}`} className="contact-button inline-flex items-center gap-3 rounded-full px-5 py-4 text-sm font-medium sm:px-8 sm:text-base"><Mail size={20} />{email}</a><a href="https://t.me/wxoao" target="_blank" rel="noreferrer" className="mt-4 flex w-fit items-center gap-3 rounded-full border border-[#D7E2EA]/50 px-8 py-4 transition-colors hover:bg-white/10"><Send size={20} />Telegram · @wxoao</a><button onClick={copy} className="mt-6 flex items-center gap-2 text-sm text-[#D7E2EA]/70">{copied ? <Check size={16} /> : <Copy size={16} />}{copied ? t.emailCopied : t.copyEmail}</button></dialog>;
 }

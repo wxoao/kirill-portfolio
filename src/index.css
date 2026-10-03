@@ -18,18 +18,90 @@ button:focus-visible, a:focus-visible { outline: 2px solid #BBCCD7; outline-offs
 .project-card { transform-origin: top center; }
 .dialog::backdrop { background: rgba(0,0,0,.8); backdrop-filter: blur(10px); }
 .dialog { color: #D7E2EA; background: #141414; border: 1px solid #3c3c3c; border-radius: 28px; margin: auto; max-width: min(640px, calc(100vw - 32px)); padding: 32px; }
-.project-image { background: #191919; }
+
 .project-dialog { max-width: min(900px, calc(100vw - 32px)); max-height: 90vh; }
 body:has(dialog[open]) { overflow: hidden; }
-@media (min-width: 640px) and (max-height: 850px) {
-  .project-image-top { height: min(16vw, 18vh) !important; }
-  .project-image-bottom { height: min(22vw, 26vh) !important; }
-}
+
 @media (max-width: 639px) {
   #about { min-height: 850px; }
   #about > .absolute { opacity: .65 !important; }
-  .project-stage { height: max(85vh, 600px); }
+
   .project-card > div:first-child > button { margin-left: auto; padding: 10px 24px; font-size: 12px; }
 }
 @media (max-width: 639px) { .hero-portrait { pointer-events: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+.marquee-track { padding-right: 12px; animation: marquee-loop linear infinite; will-change: transform; }
+.marquee-track-reverse { animation-direction: reverse; }
+@keyframes marquee-loop { from { transform: translateX(-33.333333%); } to { transform: translateX(-66.666667%); } }
+.project-dialog { overflow-y: auto; }
+.project-gallery { display: grid; gap: 16px; }
+.project-gallery-item { display: flex; justify-content: center; align-items: center; min-width: 0; }
+.project-gallery img { display: block; width: auto; height: auto; max-width: 100%; max-height: min(480px, 65vh); object-fit: contain; border-radius: 16px; }
+@media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+
+/* Bound the layout, not the source image: every project has the same card size. */
+.project-card { display: flex; flex-direction: column; height: clamp(520px, calc(100svh - 180px), 820px); overflow: hidden; }
+.project-card > div:first-child, .project-card > p { flex-shrink: 0; }
+.project-card-gallery { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-rows: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; }
+.project-card-visual { min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.project-card-cover { grid-column: 2; grid-row: 1 / 3; }
+.project-card-visual img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; border-radius: 16px; }
+.hero-portrait { top: clamp(100px, 16vw, 240px); width: clamp(360px, 38vw, 520px); }
+@media (max-width: 639px) {
+  .hero-section { height: 100svh; }
+  .hero-section nav { gap: 10px; padding-left: 16px; padding-right: 16px; font-size: 10px; letter-spacing: .02em; }
+  .hero-portrait { top: 100px; width: min(72vw, 310px); }
+  .project-stage { position: relative; top: auto; height: auto; margin-bottom: 24px; }
+  .project-card { top: 0 !important; height: 560px; transform: none !important; border-radius: 28px; }
+  .project-card > div:first-child { margin-bottom: 16px; gap: 12px; }
+  .project-card > div:first-child > div { gap: 12px; min-width: 0; }
+  .project-card > div:first-child h3 { overflow-wrap: anywhere; }
+  .project-card > p { margin-bottom: 16px; }
+  .project-card-gallery { gap: 10px; }
+  .project-dialog { padding: 20px; max-height: 90svh; }
+  .project-dialog h2 { font-size: 20px; overflow-wrap: anywhere; }
+  .project-dialog p { font-size: 15px; }
+  .marquee-track img { width: 280px; }
+}
+@media (min-width: 640px) and (max-height: 700px) {
+  .project-card { height: 500px; padding: 20px; }
+  .project-card > div:first-child, .project-card > p { margin-bottom: 16px; }
+  .project-card > div:first-child > div > span { font-size: 64px !important; }
+  .hero-portrait { top: 110px; width: min(34vw, 360px); }
+}
+
+.project-card h3 { overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  .project-card > div:first-child > button { margin-left: 0; padding: 10px 12px; font-size: 10px; letter-spacing: .03em; }
+  .project-card > div:first-child > div > span { font-size: 40px !important; }
+}
+
+/* Contact modal: retain the native dialog until its exit motion finishes. */
+.contact-dialog { max-height: 90svh; overflow-y: auto; }
+.contact-dialog[open] { animation: contact-enter 320ms cubic-bezier(.16, 1, .3, 1) both; }
+.contact-dialog[open]::backdrop { animation: contact-backdrop-enter 320ms ease both; }
+.contact-dialog[open].is-closing { animation: contact-exit 220ms ease-in both; pointer-events: none; }
+.contact-dialog[open].is-closing::backdrop { animation: contact-backdrop-exit 220ms ease-in both; }
+@keyframes contact-enter { from { opacity: 0; transform: translateY(20px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes contact-exit { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(12px) scale(.97); } }
+@keyframes contact-backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes contact-backdrop-exit { from { opacity: 1; } to { opacity: 0; } }
+.action-hover { transition: transform 220ms cubic-bezier(.2,.8,.2,1), filter 220ms ease, background-color 220ms ease; }
+@media (hover: hover) and (pointer: fine) { .action-hover:hover { transform: translateY(-2px) scale(1.035); } }
+.action-hover:active { transform: scale(.98); }
+@media (prefers-reduced-motion: reduce) {
+  .contact-dialog[open], .contact-dialog[open]::backdrop { animation: none; }
+  .action-hover:hover, .action-hover:active { transform: none; }
+}
+
+/* Hide only the scrollbar chrome; wheel, touch and keyboard scrolling remain. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.project-dialog[open] { animation: contact-enter 320ms cubic-bezier(.16, 1, .3, 1) both; }
+.project-dialog[open]::backdrop { animation: contact-backdrop-enter 320ms ease both; }
+.project-dialog[open].is-closing { animation: contact-exit 220ms ease-in both; pointer-events: none; }
+.project-dialog[open].is-closing::backdrop { animation: contact-backdrop-exit 220ms ease-in both; }
+@media (prefers-reduced-motion: reduce) {
+  .project-dialog[open], .project-dialog[open]::backdrop { animation: none; }
+}
