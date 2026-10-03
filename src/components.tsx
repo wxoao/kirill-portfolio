@@ -1,9 +1,58 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { X, Mail, Check, Copy, Send } from 'lucide-react';
-import { useLanguage } from './i18n';
+import { X, Mail, Check, Copy, Send, Menu } from 'lucide-react';
+import { LanguageToggle, useLanguage } from './i18n';
 
 const MotionDiv = motion.create('div');
+
+export function MobileNavigation({ onContact }: { onContact: () => void }) {
+  const { t } = useLanguage();
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [open, setOpen] = useState(false);
+  const reduced = useReducedMotion();
+  const close = (immediate = false) => {
+    if (immediate) dialog.current?.close();
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (open) {
+      element.classList.remove('is-closing');
+      if (!element.open) element.showModal();
+      return;
+    }
+    if (!element.open) return;
+    if (reduced) { element.close(); return; }
+    element.classList.add('is-closing');
+    const timer = window.setTimeout(() => element.close(), 220);
+    return () => window.clearTimeout(timer);
+  }, [open, reduced]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const handleResize = () => {
+      if (desktop.matches) { dialog.current?.close(); setOpen(false); }
+    };
+    desktop.addEventListener('change', handleResize);
+    return () => desktop.removeEventListener('change', handleResize);
+  }, []);
+
+  return <>
+    <div className="mobile-navigation relative z-20 flex justify-end px-5 pt-4 md:hidden">
+      <button type="button" className="mobile-menu-trigger" aria-label={t.openMenu} aria-haspopup="dialog" aria-controls="mobile-menu" aria-expanded={open} onClick={() => setOpen(true)}><Menu size={28} /></button>
+    </div>
+    <dialog ref={dialog} id="mobile-menu" className="mobile-menu" aria-labelledby="mobile-menu-title" onCancel={event => { event.preventDefault(); close(); }} onClick={event => { if (event.target === event.currentTarget) close(); }}>
+      <div className="mobile-menu-header"><h2 id="mobile-menu-title">{t.menuTitle}</h2><button type="button" aria-label={t.closeMenu} onClick={() => close()}><X size={28} /></button></div>
+      <nav aria-label={t.navLabel}>
+        {[[t.navAbout, '#about'], [t.services, '#services'], [t.navProjects, '#projects']].map(([label, href]) => <a key={href} href={href} onClick={() => close(true)}>{label}</a>)}
+        <button type="button" onClick={() => { close(true); onContact(); }}>{t.navContact}</button>
+        <LanguageToggle />
+      </nav>
+    </dialog>
+  </>;
+}
 
 export function FadeIn({ children, delay = 0, duration = 0.7, x = 0, y = 30, className = '' }: { children: ReactNode; delay?: number; duration?: number; x?: number; y?: number; className?: string }) {
   const reduced = useReducedMotion();

@@ -10,6 +10,10 @@ const heroHeading = "HI,\u200aI'M KIRILL";
 const translations = {
   ru: {
     navLabel: 'Основная навигация',
+    footerNavigation: 'Разделы',
+    menuTitle: 'Меню',
+    openMenu: 'Открыть меню',
+    closeMenu: 'Закрыть меню',
     navAbout: 'Обо мне',
     navProjects: 'Кейсы',
     navContact: 'Связь',
@@ -44,6 +48,10 @@ const translations = {
   },
   en: {
     navLabel: 'Main navigation',
+    footerNavigation: 'Explore',
+    menuTitle: 'Menu',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
     navAbout: 'About',
     navProjects: 'Projects',
     navContact: 'Contact',
