@@ -12,7 +12,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid #BBCCD7; outline-offs
 ::selection { background: #7621B0; color: white; }
 .hero-heading { background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .contact-button { background: linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%); box-shadow: 0 4px 4px rgba(181,1,167,.25), 4px 4px 12px #7721B1 inset; outline: 2px solid white; outline-offset: -3px; }
-.hero-portrait img { width: 100%; height: auto; display: block; }
+/* Match the previous head's visible height, accounting for the new PNG's transparent margins. */
+.hero-portrait-frame { position: relative; aspect-ratio: 1450 / 1570; }
+.hero-portrait img { position: absolute; top: -3.612%; left: -12.338%; width: 124.676%; max-width: none; height: auto; display: block; }
 .project-card { transform-origin: top center; }
 .dialog::backdrop { background: rgba(0,0,0,.8); backdrop-filter: blur(10px); }
 .dialog { color: #D7E2EA; background: #141414; border: 1px solid #3c3c3c; border-radius: 28px; margin: auto; max-width: min(640px, calc(100vw - 32px)); padding: 32px; }
