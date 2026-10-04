@@ -60,45 +60,6 @@ export const services = [
   { name: 'FULL-CYCLE PRODUCT MANAGEMENT', description: { ru: 'Полный цикл: от идеи и архитектуры до быстрой сборки MVP, тестов и вывода в продакшн.', en: 'End-to-end management: from raw concept to rapid MVP launch and deployment.' } },
 ];
 
-const previewImageSets: string[][] = [
-  [
-    "icliker1.jpg",
-    "icliker2.jpg",
-    "icliker3.png",
-    "icliker4.png",
-    "icliker5.png"
-  ],
-  [
-    "3dgameschool — 2026-10-03 в 18.24.46.png",
-    "3dgameschool — 2026-10-03 в 18.27.57.png",
-    "3dgameschool — 2026-10-03 в 18.30.25.png",
-    "3dgameschool — 2026-10-03 в 18.31.07.png"
-  ],
-  [
-    "browser1.png",
-    "browser2.png",
-    "browser3.png",
-    "browser4.png"
-  ],
-  [
-    "kotiki1.jpg",
-    "kotiki3.png",
-    "kotiki4.png",
-    "kotiki5.png"
-  ],
-  [
-    "osdkino1.jpg",
-    "osdkino2.jpg",
-    "osdkino3.jpg"
-  ],
-  [
-    "maxkino1.png",
-    "maxkino2.jpg",
-    "maxkino3.jpg",
-    "maxkino5.jpg"
-  ]
-].map(files => files.map(image));
-
 const projectImageSets: string[][] = [
   [
     "icliker1.jpg",
@@ -180,7 +141,7 @@ export interface Project {
   description: LocalizedText;
   stack: string;
   images: string[];
-  previewImages: string[];
+  previewImage: string;
   url?: string;
 }
 
@@ -194,7 +155,7 @@ export const projects: Project[] = [
     description: { ru: 'Продуктовая HTML5-игра для платформы Яндекс Игры. Игрок проходит путь от покупки первых моделей до масштабного бизнеса: прогрессия моделей iPhone, система пассивного дохода, сервис-центр, Trade-In механика, Battle Pass, реклама и внутриигровые покупки. Проект постоянно поддерживается, развиваются новые фичи и масштабируется база игроков.', en: 'A featured HTML5 game on Yandex Games. Players build an iPhone reselling empire with model progression, passive income streams, repair shop, Trade-In mechanics, Battle Pass, and in-game monetization. The project is actively maintained, updated with new content, and scaling continuous player retention.' },
     stack: 'HTML5, CSS3, JavaScript (ES Modules), Web Audio API, Yandex Games SDK.',
     images: projectImageSets[0],
-    previewImages: previewImageSets[0],
+    previewImage: image('icliker14.png'),
   },
   {
     id: 'school-horror',
@@ -204,7 +165,7 @@ export const projects: Project[] = [
     description: { ru: 'Сюжетный 3D-хоррор от первого лица для ПК и мобильных устройств под платформу WebGL / Яндекс Игры. Игрок исследует заброшенную школу и выполняет поручения охранника Васи. Реализовано 10 сюжетных миссий, инвентарь, интерактивные предметы, система оружия, враги с AI, облачные сохранения и 3 финальные концовки.', en: 'First-person story-driven 3D horror game built for PC & Mobile WebGL (Yandex Games). Players explore an abandoned school completing 10 narrative quests for guard Vasya. Features item inventory, weapons, AI enemies, cloud saves, and 3 distinct storyline endings.' },
     stack: 'Unity 6.3 LTS (URP 17.3), C#, PluginYG2 SDK, WebGL.',
     images: projectImageSets[1],
-    previewImages: previewImageSets[1],
+    previewImage: image('3dgameschool — 2026-10-03 в 18.13.31.png'),
   },
   {
     id: 'wxoao-browser',
@@ -214,7 +175,7 @@ export const projects: Project[] = [
     description: { ru: 'Нативное мобильное приложение под watchOS, позволяющее с комфортом серфить интернет прямо с экрана Apple Watch. Специально адаптированный UI/UX под компактный дисплей, оптимизированная загрузка страниц и управление вкладками.', en: 'Native watchOS app enabling full web browsing functionality directly on Apple Watch screens. Features UI/UX tailored for compact displays, fast page rendering, and seamless interaction.' },
     stack: 'Swift, SwiftUI, WebKit, watchOS SDK.',
     images: projectImageSets[2],
-    previewImages: previewImageSets[2],
+    previewImage: image('browser4.png'),
   },
   {
     id: 'cute-cats-merge',
@@ -225,7 +186,7 @@ export const projects: Project[] = [
     description: { ru: 'Казуальная HTML5-игра с механиками Suika и физическим движком Matter.js. Цепочка эволюции из 35 уникальных котов, динамический спавн, галерея коллекций, магазин фонов и кастомизация, таблицы лидеров и облачная синхронизация.', en: 'Casual HTML5 puzzle game powered by Matter.js physics. Includes a 35-cat evolution chain, collection gallery, background store, leaderboard integration, and cloud state saves via Yandex Games SDK.' },
     stack: 'HTML5, JavaScript, Matter.js, Web Audio API, Yandex Games SDK.',
     images: projectImageSets[3],
-    previewImages: previewImageSets[3],
+    previewImage: image('kotiki1.jpg'),
   },
   {
     id: 'stranger-things-cinema',
@@ -235,7 +196,7 @@ export const projects: Project[] = [
     description: { ru: 'Специализированный онлайн-кинотеатр внутри Telegram с каталогом серий, адаптивным видеоплеером и таймером обратного отсчета до премьер. Проект показал взрывной органический рост, собрав аудиторию в 6 000+ человек благодаря продуманному UX и шерингу.', en: 'Feature-rich online cinema built inside Telegram Web Apps framework. Includes structured season catalog, integrated video player, and countdown timers. Achieved viral organic growth reaching 6,000+ users without advertising expenditure.' },
     stack: 'Telegram Web Apps API, JavaScript, Node.js, Express, Nginx.',
     images: projectImageSets[4],
-    previewImages: previewImageSets[4],
+    previewImage: image('osdkino1.jpg'),
   },
   {
     id: 'max-movie-universe',
@@ -246,6 +207,6 @@ export const projects: Project[] = [
     description: { ru: 'Веб-сервис и Mini App на платформе MAX для удобного поиска и выбора фильмов. Автоматический парсинг метаданных, фильтрация по жанрам, годам и рейтингу, система кэширования и ссылки на легальные онлайн-кинотеатры.', en: 'Mini App and web showcase for movie streaming on the MAX platform. Features automated metadata indexing via API, dynamic filtering, caching, and direct routing to official streaming services.' },
     stack: 'Node.js, Express, SQLite, MAX Bridge API, PM2, Nginx.',
     images: projectImageSets[5],
-    previewImages: previewImageSets[5],
+    previewImage: image('maxkino1.png'),
   },
 ];
