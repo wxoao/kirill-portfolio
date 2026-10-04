@@ -43,10 +43,13 @@ body:has(dialog[open]) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
 
 /* Bound the layout, not the source image: every project has the same card size. */
-.project-card { display: flex; flex-direction: column; height: clamp(520px, calc(100svh - 180px), 820px); overflow: hidden; }
+#projects { --project-card-height: clamp(500px, calc(100svh - 220px), 640px); }
+.project-stage { height: calc(var(--project-card-height) + 100px); }
+.project-card { display: flex; flex-direction: column; height: var(--project-card-height); overflow: hidden; }
 .project-card > div:first-child, .project-card > p { flex-shrink: 0; }
-.project-card-visual { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
-.project-card-visual img { position: absolute; right: 0; bottom: 0; display: block; width: 68%; max-width: 960px; height: 100%; object-fit: contain; object-position: right bottom; border-radius: 16px; }
+.project-card-visual { flex: 1; min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.project-card-visual img { display: block; width: auto; height: auto; max-width: min(100%, 820px); max-height: min(100%, 340px); border-radius: 16px; }
+.project-card-visual-portrait img { max-height: min(100%, 280px); }
 .hero-portrait { top: clamp(100px, 16vw, 240px); width: clamp(360px, 38vw, 520px); }
 @media (max-width: 639px) {
   .project-dialog { padding: 20px; max-height: 90svh; }
@@ -55,7 +58,8 @@ body:has(dialog[open]) { overflow: hidden; }
   .marquee-track img { width: 280px; }
 }
 @media (min-width: 640px) and (max-height: 700px) {
-  .project-card { height: 500px; padding: 20px; }
+  #projects { --project-card-height: 500px; }
+  .project-card { padding: 20px; }
   .project-card > div:first-child, .project-card > p { margin-bottom: 16px; }
   .project-card > div:first-child > div > span { font-size: 64px !important; }
   .hero-portrait { top: 110px; width: min(34vw, 360px); }
@@ -101,7 +105,7 @@ body:has(dialog[open]) { overflow: hidden; }
   #services article p { font-size: 15px !important; }
 
   /* Keep the desktop scroll stack, sized to the stable mobile viewport. */
-  #projects { --project-stack-step: 8px; --project-card-height: clamp(440px, calc(100svh - 100px), 680px); padding-left: 16px; padding-right: 16px; }
+  #projects { --project-stack-step: 8px; --project-card-height: clamp(440px, calc(100svh - 100px), 560px); padding-left: 16px; padding-right: 16px; }
   .project-stage { top: max(16px, env(safe-area-inset-top)); height: calc(var(--project-card-height) + 100px); }
   .project-card { height: var(--project-card-height); padding: 16px; border-radius: 28px; }
   .project-card > div:first-child { flex-wrap: wrap; margin-bottom: 16px; gap: 12px; }
@@ -110,7 +114,7 @@ body:has(dialog[open]) { overflow: hidden; }
   .project-card > div:first-child h3 { font-size: 18px !important; }
   .project-card > div:first-child > button { min-height: 44px; margin-left: auto; padding: 10px 20px; font-size: 12px; letter-spacing: .06em; }
   .project-card > p { margin-bottom: 16px; font-size: 15px !important; }
-  .project-card-visual img { width: 100%; object-position: center bottom; border-radius: 10px; }
+  .project-card-visual img { border-radius: 12px; }
   .contact-dialog { padding: 20px; }
   .contact-dialog h2 { font-size: clamp(22px, 6vw, 30px); }
   .contact-dialog > div:first-child { gap: 12px; }

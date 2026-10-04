@@ -39,7 +39,7 @@ function ProjectCard({ project, index, totalCards, progress, onOpen }: { project
   return <div className="project-stage sticky top-24 h-[85vh] md:top-32"><motion.article className="project-card relative rounded-[40px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:rounded-[50px] sm:p-6 md:rounded-[60px] md:p-8" style={{ top: `calc(${index} * var(--project-stack-step, 12px))`, scale: reduced ? 1 : scale }} aria-labelledby={`project-${index}`}>
     <div className="mb-6 flex items-start justify-between gap-4 sm:mb-8"><div className="flex min-w-0 flex-1 items-center gap-5 md:gap-8"><span aria-hidden="true" className="shrink-0 font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem, 10vw, 140px)' }}>{String(index + 1).padStart(2, '0')}</span><div className="min-w-0"><p className="mb-1 text-xs font-light uppercase tracking-widest text-[#D7E2EA]/60 sm:text-sm">{project.category}</p><h3 id={`project-${index}`} className="font-medium uppercase leading-tight" style={{ fontSize: 'clamp(1.05rem, 2.2vw, 2.1rem)' }}>{name}</h3></div></div><LiveProjectButton onClick={() => onOpen(project)} /></div>
     <p className="mb-6 max-w-2xl font-light leading-relaxed opacity-60 sm:mb-8" style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.25rem)' }}>{localize(project.summary)}</p>
-    <div className="project-card-visual">
+    <div className={`project-card-visual${project.id === 'stranger-things-cinema' ? ' project-card-visual-portrait' : ''}`}>
       <img src={project.previewImage} alt={`${name} — ${t.mainVisual}`} loading="lazy" />
     </div>
   </motion.article></div>;
